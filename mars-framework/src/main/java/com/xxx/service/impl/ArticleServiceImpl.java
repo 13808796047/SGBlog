@@ -11,14 +11,20 @@ import com.xxx.domain.vo.HotArticleVo;
 import com.xxx.domain.vo.PageVo;
 import com.xxx.mapper.ArticleMapper;
 import com.xxx.service.ArticleService;
+import com.xxx.service.CategoryService;
 import com.xxx.utils.BeanCopyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+    @Autowired
+    private CategoryService categoryService;
+
     @Override
     public ResponseResult hotArticleList() {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
@@ -54,6 +60,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 分页查询
         Page<Article> page = new Page<>(page_num, page_size);
         page(page, lambdaQueryWrapper);
+        // 查询分类名称
+        List<Article> articles = page.getRecords();
+//        for (Article article : articles) {
+//
+//        }
+        articles.stream().map(article -> {
+            return article.setCategoryName(categoryService.getById(article.getCategoryId()).getName());
+        }).collect(Collectors.toList());
         List<ArticleListVo> articleListVos = BeanCopyUtils.copayBeanList(page.getRecords(), ArticleListVo.class);
         PageVo pageVo = new PageVo(articleListVos, page.getTotal());
         return ResponseResult.okResult(pageVo);
