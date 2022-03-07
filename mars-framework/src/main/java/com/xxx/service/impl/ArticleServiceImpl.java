@@ -3,6 +3,7 @@ package com.xxx.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xxx.constants.SystemConstants;
 import com.xxx.domain.ResponseResult;
 import com.xxx.domain.entity.Article;
 import com.xxx.domain.vo.HotArticleVo;
@@ -20,7 +21,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ResponseResult hotArticleList() {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         // 必须是正式发布的文章
-        queryWrapper.eq(Article::getStatus, 0);
+        queryWrapper.eq(Article::getStatus, SystemConstants.ARTICLE_STATUS_NORMAL);
         // 按照浏览量进行排序
         queryWrapper.orderByDesc(Article::getViewCount);
         // 最多只查询10条
