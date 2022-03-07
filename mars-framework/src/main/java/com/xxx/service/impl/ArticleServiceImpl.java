@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xxx.constants.SystemConstants;
 import com.xxx.domain.ResponseResult;
 import com.xxx.domain.entity.Article;
+import com.xxx.domain.vo.ArticleListVo;
 import com.xxx.domain.vo.HotArticleVo;
+import com.xxx.domain.vo.PageVo;
 import com.xxx.mapper.ArticleMapper;
 import com.xxx.service.ArticleService;
 import com.xxx.utils.BeanCopyUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
@@ -38,5 +41,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        }
         List<HotArticleVo> articleVos = BeanCopyUtils.copayBeanList(articles, HotArticleVo.class);
         return ResponseResult.okResult(articleVos);
+    }
+
+    @Override
+    public ResponseResult articleList(Integer page_num, Integer page_size, Long category_id) {
+        // 查询条件
+        LambdaQueryWrapper<Article> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        // 如果有category_id 查询传入
+        lambdaQueryWrapper.eq(Objects.nonNull(category_id) && category_id > 0, Article::getCategoryId, category_id);
+        lambdaQueryWrapper.eq(Article::getStatus, SystemConstants.ARTICLE_STATUS_NORMAL);
+        lambdaQueryWrapper.orderByDesc(Article::getIsTop);
+        // 分页查询
+        Page<Article> page = new Page<>(page_num, page_size);
+        page(page, lambdaQueryWrapper);
+        List<ArticleListVo> articleListVos = BeanCopyUtils.copayBeanList(page.getRecords(), ArticleListVo.class);
+        PageVo pageVo = new PageVo(articleListVos, page.getTotal());
+        return ResponseResult.okResult(pageVo);
     }
 }

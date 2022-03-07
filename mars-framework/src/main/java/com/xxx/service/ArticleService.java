@@ -6,4 +6,6 @@ import com.xxx.domain.entity.Article;
 
 public interface ArticleService extends IService<Article> {
     ResponseResult hotArticleList();
+
+    ResponseResult articleList(Integer page_num, Integer page_size, Long category_id);
 }
