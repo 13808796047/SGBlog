@@ -37,7 +37,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //            articleVos.add(vo);
 //        }
         List<HotArticleVo> articleVos = BeanCopyUtils.copayBeanList(articles, HotArticleVo.class);
-
         return ResponseResult.okResult(articleVos);
     }
 }
